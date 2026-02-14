@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, User, Mail, Phone } from 'lucide-react';
 import { sendMessageToAI } from '../services/ai';
-// 1. Import the configuration file
 import configData from '../utils/config.json';
+import { supabase } from '../utils/supabaseClient';
 
 const ChatWindow = () => {
   // 2. Extract the configuration for the currently selected industry
@@ -19,21 +19,38 @@ const ChatWindow = () => {
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   useEffect(scrollToBottom, [messages, isLoading, showForm]);
 
-  const handleLeadSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData);
-    
-    // Logic for capturing leads
-    console.log("Lead Captured:", data); 
-    
+const handleLeadSubmit = async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+  
+  try {
+    // Save to Supabase (Project Requirement: Lead Capture)
+    const { error } = await supabase
+      .from('leads')
+      .insert([
+        { 
+          name: data.name, 
+          email: data.email, 
+          phone: data.phone,
+          industry: configData.selected // Track which industry the lead came from
+        }
+      ]);
+
+    if (error) throw error;
+
     setMessages(prev => [...prev, { 
       id: Date.now(), 
-      text: `Got it, ${data.name}! Our team specializing in ${configData.selected} has been notified. They will reach out to ${data.email} shortly.`, 
+      text: `Got it, ${data.name}! Our ${configData.selected} team has your details and will reach out to ${data.email} shortly.`, 
       sender: 'bot' 
     }]);
     setShowForm(false);
-  };
+
+  } catch (error) {
+    console.error("Supabase Error:", error.message);
+    alert("There was an error saving your request. Please try again.");
+  }
+};
 
   const handleSend = async (e) => {
     e.preventDefault();
