@@ -1,4 +1,3 @@
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import configData from '../utils/config.json';
 
@@ -8,7 +7,6 @@ export const sendMessageToAI = async (userMessage, industryName) => {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const industry = configData.industries[industryName];
-
 
     const systemInstruction = `
       You are ${industry.botName}, a world-class AI assistant specializing in ${industryName}.

@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Get these from your Supabase Project Settings > API
+if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+  console.warn("Supabase credentials missing. Check your .env file!");
+}
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
