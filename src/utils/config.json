@@ -1,0 +1,15 @@
+{
+  "selected": "Real Estate",
+  "industries": {
+    "Real Estate": {
+      "welcome": "Welcome to the Property Hub! Looking for a home?",
+      "color": "cb-bg-blue-600",
+      "botName": "EstateBot"
+    },
+    "Healthcare": {
+      "welcome": "Hello. How can I assist with your medical inquiry?",
+      "color": "cb-bg-green-600",
+      "botName": "HealthAssist"
+    }
+  }
+}
