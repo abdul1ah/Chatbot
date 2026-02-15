@@ -5,23 +5,44 @@ import { supabase } from '../utils/supabaseClient';
 const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
-  const industry = configData.industries[configData.selected];
   
+  const getInitialIndustry = () => {
+
+    const params = new URLSearchParams(window.location.search);
+    const urlIndustry = params.get('industry');
+
+
+    if (urlIndustry && configData.industries[urlIndustry]) {
+      console.log(`Switched to ${urlIndustry} mode via URL`);
+      return configData.industries[urlIndustry];
+    }
+    
+
+    return configData.industries[configData.selected];
+  };
+
+  const industry = getInitialIndustry(); 
+
+
   // State
   const [isOpen, setIsOpen] = useState(false);
+  
+  
   const [messages, setMessages] = useState([
     { id: 1, text: industry.welcome, sender: 'bot', type: 'text' }
   ]);
+  
   const [isTyping, setIsTyping] = useState(false);
+  
+
   const [quickReplies, setQuickReplies] = useState(industry.quickReplies);
 
-  // Analytics: Log Message to Supabase
   const logMessage = async (text, sender) => {
     try {
       await supabase.from('chat_logs').insert([
         { 
-          session_id: 'session-' + Date.now(), // Simple session ID
-          industry: configData.selected,
+          session_id: 'session-' + Date.now(), 
+          industry: industry.botName, // Log which bot was used
           sender: sender,
           message: text 
         }
@@ -33,7 +54,7 @@ export const ChatProvider = ({ children }) => {
 
   const addMessage = (text, sender) => {
     setMessages(prev => [...prev, { id: Date.now(), text, sender }]);
-    logMessage(text, sender); // Trigger Analytics
+    logMessage(text, sender); 
   };
 
   return (
@@ -42,7 +63,7 @@ export const ChatProvider = ({ children }) => {
       isOpen, setIsOpen, 
       messages, setMessages, addMessage,
       isTyping, setIsTyping,
-      quickReplies, setQuickReplies
+      quickReplies, setQuickReplies 
     }}>
       {children}
     </ChatContext.Provider>
