@@ -21,7 +21,7 @@ function App() {
       {}
       <div className="cb-z-10 cb-text-center">
         <h1 className="cb-text-slate-400 cb-text-sm cb-font-medium cb-tracking-[0.3em] cb-uppercase cb-animate-pulse">
-          AI Widget Environment
+          AI INDUSTRY CHATBOT
         </h1>
       </div>
 

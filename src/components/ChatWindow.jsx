@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, X, Sparkles, User, Mail, Phone } from 'lucide-react';
+import { Send, X, Sparkles, User, Bot, Phone, ChevronDown } from 'lucide-react';
 import { sendMessageToAI } from '../services/ai';
-import { supabase } from '../utils/supabaseClient'; // Make sure this is imported
+import { supabase } from '../utils/supabaseClient';
 import configData from '../utils/config.json';
 
 const ChatWindow = () => {
@@ -14,14 +14,15 @@ const ChatWindow = () => {
   const [showForm, setShowForm] = useState(false);
   const messagesEndRef = useRef(null);
 
+  // Trigger proactive greeting
   useEffect(() => {
     const timer = setTimeout(() => { if (!isOpen) setShowProactive(true); }, 3000);
     return () => clearTimeout(timer);
   }, [isOpen]);
 
+  // Auto-scroll
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, isTyping]);
 
-  // FIX: Proper Lead Submission to Supabase
   const handleLeadSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -41,7 +42,7 @@ const ChatWindow = () => {
 
       setMessages(prev => [...prev, { 
         id: Date.now(), 
-        text: `Got it, ${data.name}! Our experts have been notified. They'll reach out to you at ${data.email} soon.`, 
+        text: `Thanks, ${data.name}! A specialized agent will contact you at ${data.email} shortly.`, 
         sender: 'bot' 
       }]);
       setShowForm(false);
@@ -73,78 +74,131 @@ const ChatWindow = () => {
   return (
     <div className="cb-fixed cb-bottom-6 cb-right-6 cb-z-50 cb-font-sans">
       
-      {/* Proactive Greeting */}
+      {/* Proactive Greeting Bubble */}
       {showProactive && !isOpen && (
-        <div className="cb-absolute cb-bottom-20 cb-right-0 cb-w-48 cb-p-3 cb-bg-slate-900 cb-text-white cb-rounded-2xl cb-shadow-2xl cb-text-xs cb-animate-bounce cb-border cb-border-slate-700">
-          <button onClick={() => setShowProactive(false)} className="cb-absolute cb-top-1 cb-right-1">
-            <X size={12} className="cb-text-slate-400 hover:cb-text-white"/>
+        <div className="cb-absolute cb-bottom-20 cb-right-0 cb-w-64 cb-p-4 cb-bg-slate-900 cb-text-white cb-rounded-2xl cb-rounded-tr-none cb-shadow-2xl cb-border cb-border-slate-700 cb-animate-bounce">
+          <button onClick={() => setShowProactive(false)} className="cb-absolute cb-top-2 cb-right-2">
+            <X size={14} className="cb-text-slate-400 hover:cb-text-white"/>
           </button>
-          {activeIndustry.welcome}
+          <div className="cb-flex cb-gap-3 cb-items-center">
+            <div className="cb-w-8 cb-h-8 cb-bg-blue-600 cb-rounded-full cb-flex cb-items-center cb-justify-center">
+               <Bot size={16} />
+            </div>
+            <p className="cb-text-xs cb-font-medium">{activeIndustry.welcome}</p>
+          </div>
         </div>
       )}
 
-      {/* Launcher Button */}
+      {/* Launcher Button (Pulse Effect) */}
       <button 
         onClick={() => { setIsOpen(!isOpen); setShowProactive(false); }}
-        className={`cb-w-14 cb-h-14 cb-rounded-full cb-flex cb-items-center cb-justify-center cb-shadow-2xl cb-transition-transform hover:cb-scale-110 ${activeIndustry.color}`}
+        className={`cb-group cb-relative cb-w-16 cb-h-16 cb-rounded-full cb-flex cb-items-center cb-justify-center cb-shadow-2xl cb-transition-all hover:cb-scale-110 active:cb-scale-95 ${activeIndustry.color}`}
       >
-        {isOpen ? <X color="white" /> : <Sparkles color="white" />}
+        <div className="cb-absolute cb-inset-0 cb-rounded-full cb-bg-white cb-opacity-20 group-hover:cb-animate-ping"></div>
+        {isOpen ? <X color="white" size={28} /> : <Sparkles color="white" size={28} />}
       </button>
 
-      {/* Main Glassmorphic Window */}
+      {/* MAIN CHAT WINDOW */}
       {isOpen && (
-        <div className="cb-absolute cb-bottom-20 cb-right-0 cb-w-96 cb-h-[550px] cb-bg-white/90 cb-backdrop-blur-xl cb-rounded-3xl cb-shadow-2xl cb-border cb-border-white/40 cb-flex cb-flex-col cb-overflow-hidden">
+        <div className="cb-absolute cb-bottom-24 cb-right-0 cb-w-[380px] cb-h-[450px] cb-bg-white/95 cb-backdrop-blur-2xl cb-rounded-3xl cb-shadow-2xl cb-border cb-border-white/50 cb-flex cb-flex-col cb-overflow-hidden cb-animate-in cb-slide-in-from-bottom-10 cb-duration-300">
           
-          <div className={`${activeIndustry.color} cb-p-5 cb-text-white cb-font-bold cb-flex cb-justify-between cb-items-center`}>
-             <div className="cb-flex cb-items-center cb-gap-2">
-                <div className="cb-w-2 cb-h-2 cb-bg-green-400 cb-rounded-full cb-animate-pulse" />
-                <span>{activeIndustry.botName}</span>
+          {/* 1. Header with Gradient */}
+          <div className={`cb-p-6 cb-bg-gradient-to-r cb-from-slate-900 cb-to-slate-800 cb-text-white cb-rounded-t-3xl cb-shadow-lg cb-relative cb-overflow-hidden`}>
+             <div className="cb-absolute cb-top-0 cb-right-0 cb-w-32 cb-h-32 cb-bg-white cb-opacity-5 cb-rounded-full cb-blur-2xl cb-translate-x-10 cb--translate-y-10"></div>
+             
+             <div className="cb-flex cb-items-center cb-justify-between cb-relative cb-z-10">
+                <div className="cb-flex cb-items-center cb-gap-3">
+                   <div className="cb-relative">
+                      <div className={`cb-w-10 cb-h-10 cb-rounded-full cb-flex cb-items-center cb-justify-center cb-text-white cb-shadow-inner ${activeIndustry.color}`}>
+                        <Bot size={20} />
+                      </div>
+                      <span className="cb-absolute cb-bottom-0 cb-right-0 cb-w-3 cb-h-3 cb-bg-green-500 cb-border-2 cb-border-slate-900 cb-rounded-full"></span>
+                   </div>
+                   <div>
+                      <h3 className="cb-font-bold cb-text-base">{activeIndustry.botName}</h3>
+                      <p className="cb-text-xs cb-text-slate-300">AI Specialist • Online</p>
+                   </div>
+                </div>
+                <button onClick={() => setIsOpen(false)} className="cb-p-2 cb-bg-white/10 cb-rounded-full hover:cb-bg-white/20">
+                  <ChevronDown size={18} />
+                </button>
              </div>
-             <span className="cb-text-[10px] cb-bg-white/20 cb-px-2 cb-py-0.5 cb-rounded-full">{configData.selected}</span>
           </div>
 
-          <div className="cb-flex-1 cb-p-4 cb-overflow-y-auto cb-space-y-4 cb-bg-gray-50/50">
+          {/* 2. Messages Area (Gray Background) */}
+          <div className="cb-flex-1 cb-p-4 cb-overflow-y-auto cb-bg-slate-50 cb-space-y-6">
+            <p className="cb-text-center cb-text-[10px] cb-text-slate-400 cb-font-medium cb-uppercase cb-tracking-widest">Today</p>
+            
             {messages.map((msg) => (
-              <div key={msg.id} className={`cb-flex cb-w-full ${msg.sender === 'user' ? 'cb-justify-end' : 'cb-justify-start'}`}>
-                <div className={`cb-max-w-[85%] cb-p-3 cb-rounded-2xl cb-text-sm cb-shadow-sm cb-leading-relaxed ${
-                  msg.sender === 'user' ? `${activeIndustry.color} cb-text-white cb-rounded-tr-none cb-font-medium` : 'cb-bg-white cb-text-slate-900 cb-rounded-tl-none cb-border cb-border-gray-200'
+              <div key={msg.id} className={`cb-flex cb-w-full cb-gap-2 ${msg.sender === 'user' ? 'cb-flex-row-reverse' : 'cb-flex-row'}`}>
+                
+                {/* Avatar Icon */}
+                <div className={`cb-w-8 cb-h-8 cb-rounded-full cb-flex cb-items-center cb-justify-center cb-flex-shrink-0 ${msg.sender === 'user' ? 'cb-bg-slate-200' : `${activeIndustry.color} cb-text-white`}`}>
+                  {msg.sender === 'user' ? <User size={14} className="cb-text-slate-600"/> : <Bot size={14}/>}
+                </div>
+
+                {/* Bubble */}
+                <div className={`cb-max-w-[75%] cb-p-3.5 cb-rounded-2xl cb-text-sm cb-shadow-sm cb-leading-relaxed ${
+                  msg.sender === 'user' 
+                    ? `${activeIndustry.color} cb-text-white cb-rounded-tr-none` 
+                    : 'cb-bg-white cb-text-slate-800 cb-border cb-border-slate-100 cb-rounded-tl-none'
                 }`}>
                   {msg.text}
                 </div>
               </div>
             ))}
-            
+
             {isTyping && (
-              <div className="cb-flex cb-gap-1 cb-p-3 cb-bg-white/50 cb-w-fit cb-rounded-2xl">
-                <div className="cb-w-1.5 cb-h-1.5 cb-bg-gray-400 cb-rounded-full cb-animate-bounce" />
-                <div className="cb-w-1.5 cb-h-1.5 cb-bg-gray-400 cb-rounded-full cb-animate-bounce [animation-delay:0.2s]" />
-                <div className="cb-w-1.5 cb-h-1.5 cb-bg-gray-400 cb-rounded-full cb-animate-bounce [animation-delay:0.4s]" />
+              <div className="cb-flex cb-gap-2 cb-items-center">
+                 <div className={`cb-w-8 cb-h-8 cb-rounded-full ${activeIndustry.color} cb-flex cb-items-center cb-justify-center cb-text-white`}>
+                    <Bot size={14}/>
+                 </div>
+                 <div className="cb-bg-white cb-border cb-border-slate-100 cb-px-4 cb-py-3 cb-rounded-2xl cb-rounded-tl-none cb-shadow-sm cb-flex cb-gap-1">
+                    <div className="cb-w-1.5 cb-h-1.5 cb-bg-slate-400 cb-rounded-full cb-animate-bounce" />
+                    <div className="cb-w-1.5 cb-h-1.5 cb-bg-slate-400 cb-rounded-full cb-animate-bounce [animation-delay:0.2s]" />
+                    <div className="cb-w-1.5 cb-h-1.5 cb-bg-slate-400 cb-rounded-full cb-animate-bounce [animation-delay:0.4s]" />
+                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {!showForm ? (
-            <form onSubmit={handleSend} className="cb-p-4 cb-bg-white/60 cb-backdrop-blur-md cb-border-t cb-flex cb-gap-2">
-              <input 
-                value={inputText} 
-                onChange={(e) => setInputText(e.target.value)} 
-                placeholder="Type a message..." 
-                className="cb-flex-1 cb-p-3 cb-bg-white cb-border cb-border-gray-300 cb-rounded-2xl cb-text-sm cb-text-slate-900 cb-placeholder-gray-500 focus:cb-outline-none focus:cb-ring-2 focus:cb-ring-blue-500/50"
-              />
-              <button type="submit" className={`${activeIndustry.color} cb-text-white cb-p-3 cb-rounded-2xl cb-shadow-lg`}><Send size={18}/></button>
-            </form>
-          ) : (
-            <div className="cb-p-4 cb-bg-white cb-border-t cb-animate-in cb-slide-in-from-bottom">
-              <p className="cb-text-xs cb-font-bold cb-mb-3 cb-text-blue-800 cb-uppercase cb-tracking-wider">Human Support Needed</p>
-              <form onSubmit={handleLeadSubmit} className="cb-space-y-3">
-                 <input name="name" placeholder="Full Name" className="cb-w-full cb-p-2 cb-border cb-rounded-lg cb-text-sm cb-text-slate-900" required />
-                 <input name="email" type="email" placeholder="Email Address" className="cb-w-full cb-p-2 cb-border cb-rounded-lg cb-text-sm cb-text-slate-900" required />
-                 <input name="phone" type="tel" placeholder="Phone Number" className="cb-w-full cb-p-2 cb-border cb-rounded-lg cb-text-sm cb-text-slate-900" required />
-                 <button className={`${activeIndustry.color} cb-w-full cb-text-white cb-py-2 cb-rounded-lg cb-text-sm cb-font-bold hover:cb-opacity-90`}>Submit Request</button>
+          {/* 3. Input / Form Area (Floating Glass) */}
+          <div className="cb-p-4 cb-bg-white cb-border-t cb-border-slate-100">
+            {!showForm ? (
+              <form onSubmit={handleSend} className="cb-relative">
+                <input 
+                  value={inputText} 
+                  onChange={(e) => setInputText(e.target.value)} 
+                  placeholder="Ask a question..." 
+                  className="cb-w-full cb-pl-4 cb-pr-12 cb-py-3.5 cb-bg-slate-100 cb-text-slate-900 cb-placeholder-slate-500 cb-rounded-full cb-text-sm focus:cb-outline-none focus:cb-ring-2 focus:cb-ring-slate-300 focus:cb-bg-white cb-transition-all"
+                />
+                <button 
+                  type="submit" 
+                  className={`cb-absolute cb-right-1.5 cb-top-1.5 cb-p-2 cb-rounded-full ${activeIndustry.color} cb-text-white cb-shadow-md hover:cb-scale-105 cb-transition-transform`}
+                  disabled={!inputText.trim()}
+                >
+                  <Send size={16} />
+                </button>
               </form>
-            </div>
-          )}
+            ) : (
+              <div className="cb-animate-in cb-fade-in cb-slide-in-from-bottom-5">
+                <div className="cb-flex cb-items-center cb-gap-2 cb-mb-3">
+                   <div className="cb-p-1.5 cb-bg-green-100 cb-rounded-full cb-text-green-700"><Phone size={14}/></div>
+                   <p className="cb-text-xs cb-font-bold cb-text-slate-800 cb-uppercase">Callback Request</p>
+                </div>
+                <form onSubmit={handleLeadSubmit} className="cb-space-y-2">
+                   <input name="name" placeholder="Your Name" className="cb-w-full cb-p-3 cb-bg-slate-50 cb-border cb-border-slate-200 cb-rounded-xl cb-text-sm cb-text-slate-900 focus:cb-ring-2 focus:cb-ring-blue-500/20 focus:cb-outline-none" required />
+                   <input name="email" type="email" placeholder="Email Address" className="cb-w-full cb-p-3 cb-bg-slate-50 cb-border cb-border-slate-200 cb-rounded-xl cb-text-sm cb-text-slate-900 focus:cb-ring-2 focus:cb-ring-blue-500/20 focus:cb-outline-none" required />
+                   <input name="phone" type="tel" placeholder="Phone Number" className="cb-w-full cb-p-3 cb-bg-slate-50 cb-border cb-border-slate-200 cb-rounded-xl cb-text-sm cb-text-slate-900 focus:cb-ring-2 focus:cb-ring-blue-500/20 focus:cb-outline-none" required />
+                   <button className={`${activeIndustry.color} cb-w-full cb-text-white cb-py-3 cb-rounded-xl cb-text-sm cb-font-bold cb-shadow-lg hover:cb-opacity-90 cb-transition-opacity`}>
+                     Confirm Request
+                   </button>
+                </form>
+              </div>
+            )}
+          </div>
+
         </div>
       )}
     </div>

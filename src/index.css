@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* This resets the default Vite constraints */
+
 :root {
   width: 100%;
   height: 100%;
@@ -13,7 +13,7 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
-  background-color: #020617; /* Matches your dark theme */
+  background-color: #020617; 
 }
 
 #root {
@@ -21,6 +21,6 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  max-width: none; /* This fixes the squishing */
+  max-width: none; 
   text-align: left;
 }
