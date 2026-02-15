@@ -3,10 +3,11 @@ import ChatWindow from './components/ChatWindow';
 
 function App() {
   return (
-    <div className="cb-min-h-screen cb-bg-[#020617] cb-relative cb-overflow-hidden cb-flex cb-items-center cb-justify-center">
+    
+    <div className="cb-w-full cb-min-h-screen cb-bg-[#020617] cb-relative cb-overflow-hidden cb-flex cb-items-center cb-justify-center">
       
       {}
-      <div className="cb-absolute cb-inset-0 cb-pointer-events-none">
+      <div className="cb-fixed cb-inset-0 cb-pointer-events-none cb-z-0">
         {}
         <div className="cb-absolute cb--top-24 cb--left-24 cb-w-[600px] cb-h-[600px] cb-bg-blue-600/30 cb-rounded-full cb-blur-[120px]"></div>
         
@@ -18,12 +19,13 @@ function App() {
       </div>
 
       {}
-      <div className="cb-z-10">
-        <h1 className="cb-text-slate-500 cb-text-sm cb-font-medium cb-tracking-widest cb-uppercase">
+      <div className="cb-z-10 cb-text-center">
+        <h1 className="cb-text-slate-400 cb-text-sm cb-font-medium cb-tracking-[0.3em] cb-uppercase cb-animate-pulse">
           AI Widget Environment
         </h1>
       </div>
 
+      {}
       <ChatWindow />
     </div>
   );
