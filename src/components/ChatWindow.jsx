@@ -129,7 +129,7 @@ const ChatWindow = () => {
 
       {/* MAIN CHAT WINDOW */}
       {isOpen && (
-        <div className="cb-absolute cb-bottom-24 cb-right-0 cb-w-[380px] cb-h-[450px] cb-bg-white/95 cb-backdrop-blur-2xl cb-rounded-3xl cb-shadow-2xl cb-border cb-border-white/50 cb-flex cb-flex-col cb-overflow-hidden cb-animate-in cb-slide-in-from-bottom-10 cb-duration-300">
+        <div className="cb-absolute cb-bottom-24 cb-right-0 cb-w-[380px] cb-h-[475px] cb-bg-white/95 cb-backdrop-blur-2xl cb-rounded-3xl cb-shadow-2xl cb-border cb-border-white/50 cb-flex cb-flex-col cb-overflow-hidden cb-animate-in cb-slide-in-from-bottom-10 cb-duration-300">
           
           {/* 1. Header with Gradient */}
           <div className={`cb-p-6 cb-bg-gradient-to-r cb-from-slate-900 cb-to-slate-800 cb-text-white cb-rounded-t-3xl cb-shadow-lg cb-relative cb-overflow-hidden`}>
