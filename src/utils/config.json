@@ -2,14 +2,20 @@
   "selected": "Real Estate",
   "industries": {
     "Real Estate": {
-      "welcome": "Welcome to the Property Hub! Looking for a home?",
+      "botName": "EstateBot",
+      "welcome": "Welcome to Property Hub! How can I help you find your dream home?",
       "color": "cb-bg-blue-600",
-      "botName": "EstateBot"
+      "context": "Real Estate Agent",
+      "proactiveText": "Looking for a new home?",
+      "quickReplies": ["Property Listings", "Book Viewing", "Mortgage Rates", "Speak to Agent"]
     },
     "Healthcare": {
-      "welcome": "Hello. How can I assist with your medical inquiry?",
-      "color": "cb-bg-green-600",
-      "botName": "HealthAssist"
+      "botName": "HealthMate",
+      "welcome": "Hello! I'm here to assist with appointments and general health queries.",
+      "color": "cb-bg-teal-600",
+      "context": "Medical Assistant",
+      "proactiveText": "Need to book a checkup?",
+      "quickReplies": ["Book Appointment", "Clinic Hours", "Insurance Info", "Emergency Contact"]
     }
   }
 }
