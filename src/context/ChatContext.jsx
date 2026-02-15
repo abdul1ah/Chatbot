@@ -13,6 +13,7 @@ export const ChatProvider = ({ children }) => {
     { id: 1, text: industry.welcome, sender: 'bot', type: 'text' }
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [quickReplies, setQuickReplies] = useState(industry.quickReplies);
 
   // Analytics: Log Message to Supabase
   const logMessage = async (text, sender) => {
@@ -40,7 +41,8 @@ export const ChatProvider = ({ children }) => {
       industry, 
       isOpen, setIsOpen, 
       messages, setMessages, addMessage,
-      isTyping, setIsTyping 
+      isTyping, setIsTyping,
+      quickReplies, setQuickReplies
     }}>
       {children}
     </ChatContext.Provider>

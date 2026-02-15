@@ -9,21 +9,22 @@ export const sendMessageToAI = async (userMessage, industryName) => {
     const industry = configData.industries[industryName];
 
     const systemInstruction = `
-      You are ${industry.botName}, a world-class AI assistant specializing in ${industryName}.
-      TONE: Professional, empathetic, and concise. 
-      CONTEXT: ${industry.context}.
+      You are ${industry.botName}, an expert in ${industryName}.
       
       RULES:
-      1. If the user expresses interest in booking, pricing, or complex help, say ONLY: FALLBACK_TRIGGER.
-      2. If you don't know an answer, say ONLY: FALLBACK_TRIGGER.
-      3. Do not mention you are an AI unless specifically asked.
-      4. Use industry-specific terms (e.g., 'escrow' for Real Estate, 'triage' for Healthcare).
+      1. Keep answers concise (max 2 sentences).
+      2. If user asks for specific prices, booking, or human help, return ONLY: "FALLBACK_TRIGGER".
+      3. OTHERWISE, format your response exactly like this:
+         [Your Answer Here] ||| [Option1], [Option2], [Option3]
+      
+      EXAMPLE RESPONSE:
+      "A fixed-rate mortgage offers stability. ||| Current Rates, Variable Options, Apply Now"
     `;
 
     const chat = model.startChat({
       history: [
         { role: "user", parts: [{ text: systemInstruction }] },
-        { role: "model", parts: [{ text: "Acknowledged. I am ready to assist as " + industry.botName }] },
+        { role: "model", parts: [{ text: "Understood." }] },
       ],
     });
 
@@ -31,6 +32,6 @@ export const sendMessageToAI = async (userMessage, industryName) => {
     return result.response.text();
   } catch (error) {
     console.error("Gemini Error:", error);
-    return "I'm having a brief connection issue. One moment!";
+    return "I'm having trouble connecting. ||| Try again, Contact Support";
   }
 };

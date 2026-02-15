@@ -2,16 +2,26 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, X, Sparkles, User, Bot, Phone, ChevronDown } from 'lucide-react';
 import { sendMessageToAI } from '../services/ai';
 import { supabase } from '../utils/supabaseClient';
+import { useChat } from '../context/ChatContext'; 
 import configData from '../utils/config.json';
 
 const ChatWindow = () => {
-  const activeIndustry = configData.industries[configData.selected];
-  const [isOpen, setIsOpen] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
-  const [showProactive, setShowProactive] = useState(false);
-  const [messages, setMessages] = useState([{ id: 1, text: activeIndustry.welcome, sender: 'bot' }]);
+  
+  const { 
+    industry: activeIndustry, 
+    isOpen, 
+    setIsOpen, 
+    messages, 
+    addMessage, 
+    isTyping, 
+    setIsTyping,
+    quickReplies,
+    setQuickReplies
+  } = useChat();
+
   const [inputText, setInputText] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [showProactive, setShowProactive] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Trigger proactive greeting
@@ -40,11 +50,8 @@ const ChatWindow = () => {
 
       if (error) throw error;
 
-      setMessages(prev => [...prev, { 
-        id: Date.now(), 
-        text: `Thanks, ${data.name}! A specialized agent will contact you at ${data.email} shortly.`, 
-        sender: 'bot' 
-      }]);
+      // Use addMessage from context
+      addMessage(`Thanks, ${data.name}! A specialized agent will contact you at ${data.email} shortly.`, 'bot');
       setShowForm(false);
     } catch (err) {
       console.error("Save Error:", err.message);
@@ -52,24 +59,46 @@ const ChatWindow = () => {
     }
   };
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!inputText.trim()) return;
+  
+  const handleSend = async (content) => {
+      let text = content;
+      if (content && content.preventDefault) {
+        content.preventDefault();
+        text = inputText;
+      }
+      if (!text || typeof text !== 'string' || !text.trim()) return;
 
-    const userMsg = { id: Date.now(), text: inputText, sender: 'user' };
-    setMessages(prev => [...prev, userMsg]);
-    setInputText("");
-    setIsTyping(true);
+      // 1. User Message
+      addMessage(text, 'user');
+      setInputText("");
+      setIsTyping(true);
+      setQuickReplies([]); // Hide buttons while thinking
 
-    const aiResponse = await sendMessageToAI(inputText, configData.selected);
-    setIsTyping(false);
+      // 2. Get AI Response
+      const rawResponse = await sendMessageToAI(text, configData.selected);
+      setIsTyping(false);
 
-    if (aiResponse.includes("FALLBACK_TRIGGER")) {
-      setShowForm(true);
-    } else {
-      setMessages(prev => [...prev, { id: Date.now() + 1, text: aiResponse, sender: 'bot' }]);
-    }
-  };
+      // 3. Check for Fallback (Lead Gen)
+      if (rawResponse.includes("FALLBACK_TRIGGER")) {
+        setShowForm(true);
+        return;
+      }
+
+      // 4. PARSE DYNAMIC RESPONSE (Split by |||)
+      const parts = rawResponse.split("|||");
+      const botMessage = parts[0].trim();
+      
+      // Add the text part
+      addMessage(botMessage, 'bot');
+
+      // Update buttons if they exist
+      if (parts[1]) {
+        const newOptions = parts[1].split(',').map(s => s.trim());
+        setQuickReplies(newOptions);
+      } else {
+        setQuickReplies([]); // No options provided
+      }
+    };
 
   return (
     <div className="cb-fixed cb-bottom-6 cb-right-6 cb-z-50 cb-font-sans">
@@ -147,6 +176,23 @@ const ChatWindow = () => {
                 </div>
               </div>
             ))}
+
+            {}
+            {}
+            {}
+            {!isTyping && !showForm && quickReplies.length > 0 && (
+              <div className="cb-flex cb-flex-wrap cb-gap-2 cb-pl-10 cb-animate-in cb-fade-in">
+                {quickReplies.map((reply, idx) => (
+                  <button 
+                    key={idx} 
+                    onClick={() => handleSend(reply)}
+                    className="cb-text-xs cb-bg-white cb-border cb-border-blue-200 cb-text-slate-700 cb-px-3 cb-py-1.5 cb-rounded-full hover:cb-bg-blue-50 hover:cb-text-blue-600 cb-transition-all"
+                  >
+                    {reply}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {isTyping && (
               <div className="cb-flex cb-gap-2 cb-items-center">
